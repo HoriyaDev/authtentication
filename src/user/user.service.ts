@@ -20,6 +20,10 @@ export class UserService {
     return await this.userRepo.save(user);
   }
 
+
+  async findByEmail(email:string){
+    return await this.userRepo.findOne({where:{email}})
+  }
   async findAll() {
     return await this.userRepo.find();
   }
