@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,8 +14,11 @@ export class UserService {
   async create(createUserDto: CreateUserDto) {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     const user = this.userRepo.create({
-      ...createUserDto,
-      password: hashedPassword
+      firstName: createUserDto.firstName,
+      lastName: createUserDto.lastName,
+      email: createUserDto.email,
+      password: hashedPassword,
+      role: createUserDto.role,
     });
     return await this.userRepo.save(user);
   }
@@ -38,7 +41,8 @@ export class UserService {
    return await this.userRepo.update({id} , updateUserDto)
   }
 
-  async remove(id: number) {
-   return await this.userRepo.delete({id})
-  }
+ async remove(id: number) {
+  return this.userRepo.delete(id);
+}
+
 }

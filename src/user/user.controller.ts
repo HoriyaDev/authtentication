@@ -6,6 +6,8 @@ import { AuthGuard } from 'src/auth/guards/jwt_auth.guard';
 import { RolesGuard } from 'src/auth/guards/auth.guard';
 import { Roles } from 'src/auth/roles.decorator';
 import { Role } from 'src/auth/roles.enum';
+import { PermissionsGuard } from 'src/permissions/permissions.guard';
+import { PermissionsRequired } from 'src/permissions/permissions.decorator';
 
 @Controller('user')
 export class UserController {
@@ -28,12 +30,20 @@ export class UserController {
   }
 
 
-  @UseGuards(AuthGuard , RolesGuard)
+  @UseGuards( AuthGuard,RolesGuard)
   @Roles(Role.Moderator)
   @Get('moderator')
   getModeratortData(){
     return 'only for moderator'
   }
+@UseGuards(AuthGuard, PermissionsGuard)
+@PermissionsRequired('delete:user')
+@Delete(':id')
+async deleteUser(@Param('id') id: string) {
+  const userId = parseInt(id, 10); // convert string to number
+  return this.userService.remove(userId);
+}
+
 
   @Get()
   findAll() {
@@ -50,8 +60,5 @@ export class UserController {
     return this.userService.update(id, updateUserDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.userService.remove(id);
-  }
+  
 }
