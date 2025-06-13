@@ -2,8 +2,10 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, 
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { AuthGuard } from '../auth/guards/auth.guard';
-import { User } from './entities/user.entity';
+import { AuthGuard } from 'src/auth/guards/jwt_auth.guard';
+import { RolesGuard } from 'src/auth/guards/auth.guard';
+import { Roles } from 'src/auth/roles.decorator';
+import { Role } from 'src/auth/roles.enum';
 
 @Controller('user')
 export class UserController {
@@ -23,6 +25,14 @@ export class UserController {
     }
     const { password, ...result } = user;
     return result;
+  }
+
+
+  @UseGuards(AuthGuard , RolesGuard)
+  @Roles(Role.Moderator)
+  @Get('moderator')
+  getModeratortData(){
+    return 'only for moderator'
   }
 
   @Get()
